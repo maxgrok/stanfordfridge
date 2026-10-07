@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>What's for dinner? Fridge door picker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --steel:#dfe2e5; --steel-2:#c9cdd1; --paper:#fffdf6; --ink:#1d3a8a; --text:#1e2328; --muted:#5b636b;
+  --yellow:#fbe57a; --mint:#bfe3aa; --pink:#f6aac6; --kraft:#c99a5b; --kraft-2:#a87a3f; --alert:#c0262d; --good:#2f6b3a; --line:#b9c3d6;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --steel:#24282c; --steel-2:#33393e; --paper:#2d2f2a; --ink:#9db4ff; --text:#eceee9; --muted:#a9b0b6;
+    --yellow:#5a4f1c; --mint:#2e4a26; --pink:#5a2a3c; --kraft:#6b4f2a; --kraft-2:#8a6838; --alert:#ff7a7f; --good:#8fd59c; --line:#4a5568;
+  }
+}
+:root[data-theme="dark"]{
+  --steel:#24282c; --steel-2:#33393e; --paper:#2d2f2a; --ink:#9db4ff; --text:#eceee9; --muted:#a9b0b6;
+  --yellow:#5a4f1c; --mint:#2e4a26; --pink:#5a2a3c; --kraft:#6b4f2a; --kraft-2:#8a6838; --alert:#ff7a7f; --good:#8fd59c; --line:#4a5568;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--steel);
+  background-image:repeating-linear-gradient(90deg,transparent 0 2px,rgba(255,255,255,.05) 2px 3px);
+  color:var(--text);font:400 1rem/1.55 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:2rem 1.25rem 4rem}
+h1{font:700 clamp(2.6rem,7vw,4.2rem)/1 "Caveat","Comic Sans MS",cursive;color:var(--ink);margin:0 0 .4rem;transform:rotate(-1.2deg)}
+.lede{color:var(--muted);max-width:60ch;margin:0 0 1.75rem}
+.controls{display:grid;grid-template-columns:1fr;gap:1rem;margin-bottom:2rem}
+@media(min-width:760px){.controls{grid-template-columns:1.1fr 1fr}}
+.note{background:var(--paper);padding:1.1rem 1.2rem 1.2rem;box-shadow:0 2px 0 var(--steel-2),0 8px 18px rgba(0,0,0,.12);position:relative}
+.note h2,.sec-h{font:700 1.7rem/1 "Caveat",cursive;margin:0 0 .7rem;color:var(--ink)}
+.note.y{background:var(--yellow)} .note.g{background:var(--mint)}
+.days{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1rem}
+.days button,.chip{font:inherit;border:1.5px solid var(--ink);background:transparent;color:var(--ink);border-radius:999px;padding:.25rem .75rem;cursor:pointer}
+.days button[aria-pressed="true"],.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.chips{display:flex;flex-wrap:wrap;gap:.35rem}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--alert);outline-offset:2px}
+.sub{font-size:.9rem;color:var(--muted);margin:.8rem 0 .3rem}
+.toggles label{display:flex;gap:.5rem;align-items:flex-start;margin:.35rem 0;font-size:.95rem}
+.time{margin-top:1rem}
+.time label{display:block;font-size:.95rem}
+.time input[type=range]{width:100%;accent-color:var(--ink);margin:.3rem 0 0}
+.scale{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted)}
+.inv{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.15rem .8rem;font-size:.92rem;margin-top:.6rem}
+.inv .row{display:flex;gap:.4rem;align-items:center}
+.inv .row label{display:flex;gap:.4rem;align-items:center;flex:1}
+.inv .short{color:var(--alert)}
+.x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0 .25rem;line-height:1}
+.x:hover{color:var(--alert)}
+.additem{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.7rem}
+.additem input,.additem select{font:inherit;padding:.3rem .5rem;border:1.5px solid var(--ink);background:var(--paper);color:var(--text);border-radius:4px}
+.additem input{flex:1;min-width:9rem}
+details summary{cursor:pointer;font-weight:700;color:var(--ink)}
+.btn{font:700 .95rem/1 "Atkinson Hyperlegible",system-ui,sans-serif;border:2px solid var(--ink);background:var(--ink);color:var(--paper);padding:.55rem .95rem;border-radius:6px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.danger{background:transparent;color:var(--alert);border-color:var(--alert)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.results-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.8rem;margin:0 0 1rem}
+.results-head{font:700 2.2rem/1 "Caveat",cursive;color:var(--ink);margin:0}
+.cards{display:grid;grid-template-columns:1fr;gap:1.6rem}
+@media(min-width:900px){.cards{grid-template-columns:repeat(3,1fr)}}
+.card{background:var(--paper);padding:1.6rem 1.2rem 1.2rem;position:relative;
+  background-image:repeating-linear-gradient(var(--paper) 0 1.55rem,var(--line) 1.55rem calc(1.55rem + 1px));
+  box-shadow:0 10px 22px rgba(0,0,0,.16)}
+.cards .card:nth-child(1){transform:rotate(-1deg)} .cards .card:nth-child(2){transform:rotate(.8deg)} .cards .card:nth-child(3){transform:rotate(-.4deg)}
+.magnet{position:absolute;top:-12px;left:50%;width:26px;height:26px;margin-left:-13px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff8,transparent 45%),var(--c,#d33);box-shadow:0 3px 5px rgba(0,0,0,.3)}
+.rank{font:700 1.3rem/1 "Caveat",cursive;color:var(--muted)}
+.clock{display:inline-block;font:700 .85rem/1.4 "Atkinson Hyperlegible",sans-serif;border:1.5px solid var(--ink);color:var(--ink);border-radius:999px;padding:.05rem .55rem;margin-left:.4rem;background:var(--paper)}
+.clock.over{border-color:var(--alert);color:var(--alert)}
+.card h3{font:700 1.95rem/1.05 "Caveat",cursive;margin:.15rem 0 .5rem;color:var(--ink)}
+.why{font-size:.98rem;margin:0 0 .7rem;background:var(--paper)}
+.card ul{list-style:none;padding:0;margin:0;font-size:.9rem;background:var(--paper)}
+.card li{padding:.15rem 0 .15rem 1.4rem;position:relative}
+.card li::before{position:absolute;left:0;font-weight:700}
+.card li.ok::before{content:"✓";color:var(--good)}
+.card li.warn::before{content:"!";color:var(--alert);left:.3rem}
+.card li.buy::before{content:"+";color:var(--ink);left:.2rem}
+.uses{font-size:.85rem;color:var(--muted);margin-top:.6rem;background:var(--paper)}
+.empty{background:var(--paper);padding:1.2rem;max-width:60ch}
+.banner{border-left:5px solid var(--alert);background:var(--paper);padding:.6rem .9rem;margin:0 0 1.2rem;font-size:.95rem}
+.also{margin-top:2.2rem;font-size:.92rem;color:var(--muted)}
+.also b{color:var(--text)}
+/* mystery box */
+.box{margin:0 0 2rem;background:var(--kraft);color:#1e1408;padding:1.4rem 1.3rem 1.3rem;position:relative;border-radius:4px;
+  box-shadow:inset 0 0 0 3px var(--kraft-2),0 10px 22px rgba(0,0,0,.18)}
+:root[data-theme="dark"] .box{color:#f6ead6}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .box{color:#f6ead6}}
+.box::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:46px;margin-left:-23px;background:rgba(255,255,255,.18)}
+.box > *{position:relative}
+.box .tag{font:700 1.2rem/1 "Caveat",cursive}
+.box h3{font:700 clamp(2rem,5vw,2.8rem)/1 "Caveat",cursive;margin:.2rem 0 .4rem}
+.box .heat{font-size:1.1rem;letter-spacing:.1em}
+.box p{margin:.3rem 0;max-width:62ch}
+.box .actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.9rem}
+.box .btn{background:#1e1408;border-color:#1e1408;color:#f6ead6}
+.box .btn.ghost{background:transparent;color:inherit;border-color:currentColor}
+.box ol{margin:.5rem 0 0;padding-left:1.3rem;max-width:62ch}
+@media (prefers-reduced-motion:no-preference){.box.shake{animation:shake .45s ease-in-out}}
+@keyframes shake{20%{transform:rotate(-2deg)}40%{transform:rotate(2deg)}60%{transform:rotate(-1deg)}80%{transform:rotate(1deg)}}
+/* menu */
+.menu{margin-top:3rem}
+.menu-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:.8rem;margin-bottom:.9rem}
+.menu-list{list-style:none;margin:0;padding:0;background:var(--paper);box-shadow:0 8px 18px rgba(0,0,0,.1)}
+.menu-list li{display:grid;grid-template-columns:1fr auto;gap:.3rem 1rem;align-items:center;padding:.75rem 1rem;border-bottom:1px solid var(--line)}
+.menu-list li:last-child{border-bottom:0}
+.menu-list .nm{font-weight:700}
+.menu-list .meta{font-size:.85rem;color:var(--muted);grid-column:1}
+.menu-list .act{grid-row:1/span 2;grid-column:2;display:flex;gap:.4rem}
+.wild{font:700 1.05rem/1 "Caveat",cursive;color:var(--kraft-2);margin-left:.35rem}
+.status{font-size:.85rem;color:var(--muted)}
+/* dialog */
+dialog{border:0;padding:0;background:var(--paper);color:var(--text);max-width:min(640px,94vw);width:100%;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(20,24,28,.45)}
+.dlg{padding:1.3rem 1.3rem 1rem;max-height:86vh;overflow:auto}
+.dlg h2{font:700 2rem/1 "Caveat",cursive;color:var(--ink);margin:0 0 1rem}
+.f{display:grid;gap:.25rem;margin-bottom:.85rem}
+.f label,.f legend{font-weight:700;font-size:.92rem}
+.f input,.f textarea,.f select{font:inherit;padding:.4rem .55rem;border:1.5px solid var(--steel-2);border-radius:4px;background:var(--paper);color:var(--text)}
+.f textarea{min-height:4.2rem;resize:vertical}
+.f .hint{font-size:.82rem;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+@media(max-width:520px){.two{grid-template-columns:1fr}}
+fieldset{border:1.5px solid var(--steel-2);border-radius:4px;padding:.6rem .7rem;margin:0 0 .85rem}
+.ingr{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.3rem .8rem;font-size:.9rem}
+.ingr label{display:flex;justify-content:space-between;gap:.5rem;align-items:center}
+.ingr select{font:inherit;font-size:.85rem;padding:.15rem .3rem;border:1.5px solid var(--steel-2);border-radius:4px;background:var(--paper);color:var(--text)}
+.checks label{display:flex;gap:.5rem;align-items:center;font-weight:400;font-size:.95rem;margin:.2rem 0}
+.dlg-foot{display:flex;justify-content:flex-end;gap:.5rem;padding:.8rem 1.3rem;border-top:1px solid var(--line);position:sticky;bottom:0;background:var(--paper)}
+.err{color:var(--alert);font-size:.9rem;min-height:1.2em;margin:0 auto 0 0;align-self:center}
+.toast{position:fixed;left:50%;bottom:calc(1rem + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--text);color:var(--paper);padding:.6rem 1rem;border-radius:6px;font-size:.92rem;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:no-preference){.cards .card{animation:pin .35s ease-out both}.cards .card:nth-child(2){animation-delay:.06s}.cards .card:nth-child(3){animation-delay:.12s}}
+@keyframes pin{from{opacity:0;translate:0 -10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>What's for dinner?</h1>
+  <p class="lede">Built from the notes on the fridge door and what's on the shelves. Pick the night and who's eating, and the top three dinners update with the reasons they made the cut. Add, edit or remove dinners and fridge items below.</p>
+  <p class="status" id="status">Loading the family menu…</p>
+
+  <div class="controls">
+    <section class="note y" aria-labelledby="who-h">
+      <h2 id="who-h">Which night, and who's eating?</h2>
+      <div class="days" id="days" role="group" aria-label="Night of the week"></div>
+      <div class="chips" id="diners" role="group" aria-label="Who's eating"></div>
+      <p class="sub">Grandma Jo is added for Sat–Sun and Theo for Friday, per the notes. Tap a name to change it.</p>
+      <div class="time">
+        <label for="mins">Time to cook: <b id="minsOut">45 min</b></label>
+        <input type="range" id="mins" min="10" max="90" step="5" value="45" aria-describedby="minsHelp">
+        <div class="scale" aria-hidden="true"><span>10 min</span><span>90 min</span></div>
+        <p class="sub" id="minsHelp" style="margin-top:.2rem">Quicker dinners move up; anything longer than this drops down the list.</p>
+      </div>
+      <div class="toggles">
+        <label><input type="checkbox" id="mayaEggs"> Maya is OK with eggs this month (her note says still deciding)</label>
+      </div>
+    </section>
+
+    <section class="note g" aria-labelledby="inv-h">
+      <h2 id="inv-h">What's in the fridge</h2>
+      <details id="invDetails">
+        <summary>Check off what you have, or add and remove items</summary>
+        <div class="inv" id="inv"></div>
+        <form class="additem" id="addItem">
+          <input id="newItem" placeholder="New item, e.g. Tofu" aria-label="New fridge item" maxlength="40">
+          <select id="newCat" aria-label="Category">
+            <option value="produce">Produce</option><option value="fruit">Fruit</option><option value="dairy">Dairy</option>
+            <option value="meat">Meat</option><option value="protein">Plant protein</option><option value="frozen">Frozen</option>
+            <option value="carb">Bread &amp; carbs</option><option value="condiment">Condiment</option>
+          </select>
+          <button class="btn ghost" type="submit">Add item</button>
+        </form>
+      </details>
+      <p class="sub">Red items are on the grocery list and unchecked. Eggs start unchecked because the list says they're out; tick them if you have some.</p>
+    </section>
+  </div>
+
+  <div class="results-top">
+    <h2 class="results-head" id="results-h">Top 3 for tonight</h2>
+    <button class="btn" type="button" id="mysteryBtn">Open the mystery box</button>
+  </div>
+  <div id="mystery"></div>
+  <div id="banners"></div>
+  <div class="cards" id="cards" aria-live="polite"></div>
+  <p class="also" id="also"></p>
+
+  <section class="menu" aria-labelledby="menu-h">
+    <div class="menu-top">
+      <h2 class="sec-h" id="menu-h" style="margin:0">The family menu</h2>
+      <button class="btn" type="button" id="addDish">Add a dinner</button>
+    </div>
+    <ul class="menu-list" id="menuList"></ul>
+  </section>
+</div>
+
+<dialog id="dlg" aria-labelledby="dlg-h">
+  <form id="dishForm" method="dialog">
+    <div class="dlg">
+      <h2 id="dlg-h">Add a dinner</h2>
+      <div class="f"><label for="fName">Name</label><input id="fName" required maxlength="60"></div>
+      <div class="f"><label for="fBlurb">What it is</label><textarea id="fBlurb" maxlength="240"></textarea></div>
+      <div class="two">
+        <div class="f"><label for="fMins">Prep time (minutes)</label><input id="fMins" type="number" min="5" max="240" step="5" value="30" required></div>
+        <div class="f"><label for="fPantry">Pantry staples</label><input id="fPantry" placeholder="pasta, rice…" maxlength="100"></div>
+      </div>
+      <fieldset><legend>From the fridge</legend><div class="ingr" id="fIngr"></div></fieldset>
+      <fieldset class="checks"><legend>House rules</legend>
+        <label><input type="checkbox" id="fVeg"> Vegetarian: no meat, fish or chicken broth (needed for Grandma Jo)</label>
+        <label><input type="checkbox" id="fPeanut"> Contains peanuts or peanut oil (never on Theo's nights)</label>
+        <label><input type="checkbox" id="fEggs"> Uses eggs</label>
+      </fieldset>
+      <div class="two">
+        <div class="f"><label for="fPlant">Plant-based for Maya?</label>
+          <select id="fPlant"><option value="yes">Yes, as written</option><option value="swap">With a swap</option><option value="no">No</option></select></div>
+        <div class="f"><label for="fSwap">The swap</label><input id="fSwap" placeholder="leave the cheese off Maya's" maxlength="100"></div>
+      </div>
+      <div class="two">
+        <div class="f"><label for="fGreen">Green on Sam's plate?</label>
+          <select id="fGreen">
+            <option value="none">Nothing green</option><option value="sam">Broccoli trees with cheese</option>
+            <option value="hide">Greens hidden (blended)</option><option value="split">Plate Sam's first</option><option value="visible">Visibly green</option>
+          </select></div>
+        <div class="f"><label for="fSalt">Salt level</label>
+          <select id="fSalt"><option value="low">Low</option><option value="med">Medium</option><option value="high">High</option></select></div>
+      </div>
+      <div class="f"><label for="fDay">Only on one night?</label>
+        <select id="fDay"><option value="">Any night</option></select>
+        <span class="hint">Like Leo's chicken tenders, saved for Saturday.</span></div>
+    </div>
+    <div class="dlg-foot">
+      <p class="err" id="fErr" role="alert"></p>
+      <button class="btn ghost" type="button" id="fCancel">Cancel</button>
+      <button class="btn" type="submit" id="fSave">Save dinner</button>
+    </div>
+  </form>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const DAYS_LONG=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const PEOPLE=[["mom","Mom"],["r","R / Rick"],["sam","Sam"],["leo","Leo"],["maya","Maya"],["jo","Grandma Jo"],["theo","Theo"]];
+const today=(new Date().getDay()+6)%7;
+const state={day:today,diners:new Set(),mayaEggs:false,mins:45,dishes:[],items:[],loaded:false};
+let db=null, sample=null, mode="loading", lastBox=null;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,30)||"item";
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("on"),3200);}
+function itemMap(){return Object.fromEntries(state.items.map(i=>[i.key,i]));}
+function label(k){const i=itemMap()[k];return i?i.label.replace(/ \(.*\)/,""):k;}
+function has(k){const i=itemMap()[k];return !!(i&&i.have);}
+
+function defaultDiners(){
+  const d=new Set(["mom","r","sam","leo","maya"]);
+  if(state.day>=5) d.add("jo");
+  if(state.day===4) d.add("theo");
+  state.diners=d;
+}
+
+/* ---------- storage ---------- */
+const LS={get(k){try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function dishBody(d){const {id,...rest}=d;return JSON.parse(JSON.stringify(rest));}
+async function saveDish(d){
+  if(mode==="db"){ if(d.id) await db.collection("dishes").doc(d.id).set(dishBody(d)); else await db.collection("dishes").add(dishBody(d)); }
+  else { if(!d.id){d.id="l"+Date.now();state.dishes.push(d);} else state.dishes=state.dishes.map(x=>x.id===d.id?d:x); LS.set("dishes",state.dishes); renderAll(); }
+}
+async function removeDish(id){
+  if(mode==="db") await db.collection("dishes").doc(id).delete();
+  else { state.dishes=state.dishes.filter(x=>x.id!==id); LS.set("dishes",state.dishes); renderAll(); }
+}
+let itemWrite=Promise.resolve();
+function saveItems(items){
+  state.items=items; renderAll();
+  if(mode==="db"){ itemWrite=itemWrite.then(()=>db.doc("kitchen/fridge").set({items:JSON.parse(JSON.stringify(items))})).catch(e=>toast(writeErr(e))); }
+  else LS.set("items",items);
+}
+function writeErr(e){return e&&e.code==="permission_denied"?"You can view this menu but not change it.":"Couldn't save that change. Check your connection and try again.";}
+
+/* ---------- scoring ---------- */
+function score(dish){
+  const pros=[],warns=[],buy=[];let s=50;const who=state.diners;
+  const need=dish.need||[],opt=dish.opt||[];
+  if(who.has("jo")&&!dish.veg) return null;
+  if(who.has("theo")&&dish.peanuts) return null;
+  if(dish.onlyDay!=null&&dish.onlyDay!==""&&+dish.onlyDay!==state.day) return null;
+  const m=+dish.mins||30;
+  if(m<=state.mins){ s+=Math.round((state.mins-m)/state.mins*18); if(m<=state.mins*0.6) pros.push(`Done in about ${m} minutes, well inside your ${state.mins}.`); }
+  else { s-=25+(m-state.mins); warns.push(`Takes about ${m} minutes, ${m-state.mins} more than you have.`); }
+  const im=itemMap();
+  for(const k of need){ if(!has(k)){ s-=28; buy.push(label(k)+(im[k]&&im[k].short?" (already on the grocery list)":"")); } }
+  const optHave=opt.filter(has); s+=optHave.length*2;
+  for(const k of [...need,...opt]){
+    const it=im[k]; if(!it||!it.have) continue;
+    if(it.useBy!=null){
+      if(state.day<it.useBy){ s+=22; pros.push(`Uses up the ${label(k).toLowerCase()} before it turns on ${DAYS_LONG[it.useBy]}.`); }
+      else if(state.day===it.useBy){ s+=6; warns.push(`Check the ${label(k).toLowerCase()} first; the note said use it before ${DAYS_LONG[it.useBy]}.`); }
+    } else if(it.note && opt.includes(k)||it.note && need.includes(k)){ warns.push(`${label(k)}: ${it.note}`); }
+  }
+  if(who.has("sam")){
+    const g=dish.green||"none";
+    if(g==="sam"){s+=12;pros.push("Broccoli as 'trees' with cheese on top, the one green thing Sam eats.");}
+    else if(g==="none"){s+=10;pros.push("Nothing green on the plate for Sam.");}
+    else if(g==="hide"){s+=10;pros.push("The greens are blended in, so Sam won't see anything green.");}
+    else if(g==="split"){s+=2;warns.push("Plate Sam's portion before the greens go in.");}
+    else {s-=18;warns.push("Hard to keep green off Sam's plate (peas count as green).");}
+  }
+  if(who.has("maya")){
+    if(dish.eggs&&!state.mayaEggs){s-=10;warns.push("Maya hasn't decided whether eggs are OK.");}
+    if(dish.plant==="yes"){s+=12;pros.push("Fully plant-based for Maya as written.");}
+    else if(dish.plant==="swap"){s+=6;pros.push("Easy plant-based swap for Maya"+(dish.swap?": "+dish.swap:"")+".");}
+    else if(dish.veg){s-=8;warns.push("Not plant-based; Maya would need something else.");}
+    else {s-=14;warns.push("Has meat, which doesn't work for Maya this month.");}
+  }
+  if(who.has("jo")){
+    pros.push("Vegetarian with no fish or chicken broth, so it works for Grandma Jo.");
+    if(dish.salt==="low"){s+=10;pros.push("Easy to keep low-salt for Grandma; salt at the table instead.");}
+    else if(dish.salt==="med"){warns.push("Go light on salt and use low-sodium soy or broth for Grandma.");}
+    else {s-=16;warns.push("This one runs salty, which goes against Grandma's doctor's orders.");}
+  }
+  if(who.has("theo")) pros.push("No peanuts for Theo; still read every label, including sauces and oils.");
+  if(dish.onlyDay!=null&&dish.onlyDay!==""){ s+=14; pros.push(dish.onlyNote||`Saved for ${DAYS_LONG[+dish.onlyDay]}.`); }
+  return {dish,s,pros,warns,buy,optHave};
+}
+
+/* ---------- render ---------- */
+function renderControls(){
+  $("days").innerHTML=DAYS.map((d,i)=>`<button type="button" aria-pressed="${i===state.day}" data-day="${i}">${d}</button>`).join("");
+  $("diners").innerHTML=PEOPLE.map(([k,n])=>`<button type="button" class="chip" aria-pressed="${state.diners.has(k)}" data-who="${k}">${n}</button>`).join("");
+}
+function renderInv(){
+  $("inv").innerHTML=state.items.length?state.items.map(i=>`<div class="row"><label class="${i.short&&!i.have?"short":""}"><input type="checkbox" data-inv="${esc(i.key)}" ${i.have?"checked":""}> ${esc(i.label)}</label><button type="button" class="x" data-delitem="${esc(i.key)}" aria-label="Remove ${esc(i.label)}">×</button></div>`).join("")
+    :`<p class="sub" style="grid-column:1/-1">No fridge items yet. Add the first one below.</p>`;
+}
+function renderResults(){
+  $("results-h").textContent=state.day===today?"Top 3 for tonight":"Top 3 for "+DAYS_LONG[state.day];
+  const b=[];
+  if(state.diners.has("theo")) b.push(`<div class="banner"><b>Theo has a serious peanut allergy.</b> His EpiPen is in his backpack. Read every label, including sauces, bread and frozen items.</div>`);
+  if(state.day===5&&state.diners.has("jo")) b.push(`<div class="banner" style="border-color:var(--ink)">Saturday clash: Leo's tenders are saved for tonight, but Grandma Jo is vegetarian. These picks work for the whole table; the tenders can go on the side for the kids.</div>`);
+  $("banners").innerHTML=b.join("");
+  const el=$("cards");
+  if(!state.loaded){el.innerHTML="";$("also").textContent="";return;}
+  if(!state.dishes.length){el.innerHTML=`<div class="empty">The menu is empty. Use <b>Add a dinner</b> below, or open the mystery box and save a dare.</div>`;$("also").textContent="";return;}
+  if(!state.diners.size){el.innerHTML=`<div class="empty">Tap at least one name above to see dinner ideas.</div>`;$("also").textContent="";return;}
+  const ranked=state.dishes.map(score).filter(Boolean).sort((a,b)=>b.s-a.s);
+  if(!ranked.length){el.innerHTML=`<div class="empty">Nothing on the menu works for this group tonight. Add a vegetarian, peanut-free dinner, or try the mystery box.</div>`;$("also").textContent="";return;}
+  const colors=["#d23b3b","#3b78d2","#e2b23a"];
+  el.innerHTML=ranked.slice(0,3).map((r,i)=>{
+    const d=r.dish,m=+d.mins||30;
+    const lines=[...r.pros.map(p=>`<li class="ok">${esc(p)}</li>`),...r.warns.map(w=>`<li class="warn">${esc(w)}</li>`),...r.buy.map(x=>`<li class="buy">Need: ${esc(x)}</li>`)].join("");
+    const uses=[...(d.need||[]).filter(has),...r.optHave.filter(k=>!(d.need||[]).includes(k))].map(label);
+    return `<article class="card"><span class="magnet" style="--c:${colors[i]}"></span>
+      <div class="rank">pick ${i+1}<span class="clock${m>state.mins?" over":""}">${m} min</span>${d.wild?'<span class="wild">dare</span>':""}</div><h3>${esc(d.name)}</h3>
+      ${d.blurb?`<p class="why">${esc(d.blurb)}</p>`:""}<ul>${lines}</ul>
+      <p class="uses">From the fridge: ${esc(uses.join(", ")||"nothing yet")}${d.pantry?". Pantry: "+esc(d.pantry):""}.</p></article>`;
+  }).join("");
+  const rest=ranked.slice(3,6).map(r=>`${esc(r.dish.name)} (${+r.dish.mins||30} min)`);
+  $("also").innerHTML=rest.length?`<b>Also possible:</b> ${rest.join(", ")}.`:"";
+}
+function renderMenu(){
+  const list=[...state.dishes].sort((a,b)=>a.name.localeCompare(b.name));
+  $("menuList").innerHTML=!state.loaded?"":list.length?list.map(d=>{
+    const tags=[`${+d.mins||30} min`,d.veg?"vegetarian":"has meat",d.plant==="yes"?"plant-based":d.plant==="swap"?"plant-based with a swap":null,d.peanuts?"peanuts":null,d.onlyDay!=null&&d.onlyDay!==""?"only "+DAYS_LONG[+d.onlyDay]:null].filter(Boolean).join(", ");
+    return `<li><span class="nm">${esc(d.name)}${d.wild?'<span class="wild">dare</span>':""}</span><span class="meta">${esc(tags)}</span>
+      <span class="act"><button class="btn ghost" type="button" data-edit="${esc(d.id)}">Edit</button><button class="btn danger" type="button" data-del="${esc(d.id)}">Delete</button></span></li>`;
+  }).join(""):`<li><span class="meta">No dinners yet. Add the first one.</span></li>`;
+}
+function renderAll(){renderControls();renderInv();renderResults();renderMenu();}
+
+/* ---------- dish form ---------- */
+let editing=null;
+function openForm(d){
+  editing=d||null;
+  $("dlg-h").textContent=d?"Edit dinner":"Add a dinner";
+  $("fSave").textContent=d?"Save changes":"Save dinner";
+  $("fErr").textContent="";
+  $("fName").value=d?.name||""; $("fBlurb").value=d?.blurb||""; $("fMins").value=d?.mins||30; $("fPantry").value=d?.pantry||"";
+  $("fVeg").checked=d?!!d.veg:true; $("fPeanut").checked=!!d?.peanuts; $("fEggs").checked=!!d?.eggs;
+  $("fPlant").value=d?.plant||"no"; $("fSwap").value=d?.swap||""; $("fGreen").value=d?.green||"none"; $("fSalt").value=d?.salt||"med";
+  $("fDay").innerHTML=`<option value="">Any night</option>`+DAYS_LONG.map((n,i)=>`<option value="${i}">${n}</option>`).join("");
+  $("fDay").value=d&&d.onlyDay!=null?String(d.onlyDay):"";
+  const need=new Set(d?.need||[]),opt=new Set(d?.opt||[]);
+  $("fIngr").innerHTML=state.items.length?state.items.map(i=>`<label><span>${esc(label(i.key))}</span><select data-ing="${esc(i.key)}">
+    <option value="">—</option><option value="need" ${need.has(i.key)?"selected":""}>Must have</option><option value="opt" ${opt.has(i.key)?"selected":""}>Nice to have</option></select></label>`).join("")
+    :`<p class="sub">Add fridge items first to link ingredients.</p>`;
+  $("dlg").showModal(); $("fName").focus();
+}
+$("dishForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const name=$("fName").value.trim(); if(!name){$("fErr").textContent="Give the dinner a name.";return;}
+  const need=[],opt=[];
+  document.querySelectorAll("#fIngr select").forEach(s=>{if(s.value==="need")need.push(s.dataset.ing);if(s.value==="opt")opt.push(s.dataset.ing);});
+  // keep links to items that were deleted from the fridge list
+  if(editing){const known=new Set(state.items.map(i=>i.key));(editing.need||[]).forEach(k=>{if(!known.has(k))need.push(k)});(editing.opt||[]).forEach(k=>{if(!known.has(k))opt.push(k)});}
+  const day=$("fDay").value;
+  const d={...(editing||{}),name,blurb:$("fBlurb").value.trim(),mins:Math.max(5,+$("fMins").value||30),pantry:$("fPantry").value.trim(),
+    need,opt,veg:$("fVeg").checked,peanuts:$("fPeanut").checked,eggs:$("fEggs").checked,plant:$("fPlant").value,swap:$("fSwap").value.trim(),
+    green:$("fGreen").value,salt:$("fSalt").value,onlyDay:day===""?null:+day};
+  if(day===""){delete d.onlyNote;}
+  $("fSave").disabled=true;
+  try{ await saveDish(d); $("dlg").close(); toast(editing?"Saved changes to "+name+".":"Added "+name+" to the menu."); }
+  catch(err){ $("fErr").textContent=writeErr(err); }
+  finally{ $("fSave").disabled=false; }
+});
+$("fCancel").addEventListener("click",()=>$("dlg").close());
+
+/* ---------- mystery box ---------- */
+const TECH=[["Stuffed","stuffed inside"],["Crispy","pan-fried until crispy with"],["Glazed","glazed with"],["Smashed","smashed together with"],["Layered","layered like lasagna with"],["Skewered","threaded on skewers with"],["Tostada-style","piled high on top with"],["Upside-down","baked upside-down with"]];
+const BASES=[{name:"waffle",item:"waffles"},{name:"pizza",item:"pizza"},{name:"quesadilla",item:"tortillas"},{name:"baked potato",pantry:"potatoes"},{name:"rice bowl",pantry:"rice"},{name:"pasta",pantry:"pasta"},{name:"grilled cheese",item:"bread"}];
+const DARES=["The cook doesn't reveal the ingredients until everyone has taken a bite.","Everyone rates it out of 10. Lowest score does the dishes.","Eat it with chopsticks. No exceptions.","Whoever makes a face first picks tomorrow's dinner, and it has to be the boring one.","Name it something fancy and serve it like a restaurant."];
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function mystery(){
+  const noMeat=state.diners.has("jo")||state.diners.has("maya");
+  const usable=state.items.filter(i=>i.have&&!(noMeat&&i.cat==="meat")&&!(i.reserveDay!=null&&i.reserveDay!==state.day)&&!(state.diners.has("theo")&&i.peanuts));
+  const bases=BASES.filter(b=>!b.item||usable.some(i=>i.key===b.item));
+  const base=pick(bases.length?bases:[{name:"rice bowl",pantry:"rice"}]);
+  const pool=usable.filter(i=>i.key!==base.item&&["produce","fruit","dairy","condiment","frozen","meat","protein"].includes(i.cat));
+  if(pool.length<2) return null;
+  const byCat={}; shuffle(pool).forEach(i=>{(byCat[i.cat]=byCat[i.cat]||[]).push(i);});
+  const cats=shuffle(Object.keys(byCat));
+  // force one sweet-ish and one savory-ish if available
+  const chosen=[];
+  const sweet=pool.filter(i=>i.cat==="fruit"); const tangy=pool.filter(i=>i.cat==="condiment");
+  if(sweet.length) chosen.push(pick(sweet));
+  if(tangy.length) chosen.push(pick(tangy));
+  for(const c of cats){ if(chosen.length>=3) break; const it=byCat[c].find(i=>!chosen.includes(i)); if(it&&!chosen.some(x=>x.cat===c)) chosen.push(it); }
+  const items=chosen.slice(0,3);
+  const [tName,tVerb]=pick(TECH);
+  const lbl=i=>label(i.key).toLowerCase();
+  const title=`${tName} ${items.slice(0,2).map(i=>label(i.key)).join("-")} ${base.name}`;
+  const weird=items.filter(i=>i.cat==="fruit").length+items.filter(i=>i.cat==="condiment").length+(base.name==="waffle"?1:0);
+  const heat=Math.min(3,1+Math.floor(weird/1.5));
+  const notes=[];
+  if(items.some(i=>i.green)&&state.diners.has("sam")) notes.push("Bonus dare for Sam: one green bite earns a free pass on tomorrow's veg.");
+  if(items.some(i=>i.cat==="dairy")&&state.diners.has("maya")) notes.push("Maya's portion skips the dairy.");
+  if(items.some(i=>i.useBy!=null&&state.day<i.useBy)) notes.push("Bonus: it uses up something that's about to turn.");
+  if(state.diners.has("theo")) notes.push("Peanut-free, but check every label for Theo.");
+  return {title,base,items,line:`A ${base.name} ${tVerb} ${items.map(lbl).join(", ").replace(/, ([^,]*)$/," and $1")}.`,dare:pick(DARES),heat,notes,mins:base.name==="baked potato"?60:25};
+}
+function renderBox(b,steps){
+  const el=$("mystery");
+  if(!b){el.innerHTML=`<div class="box"><p class="tag">mystery box</p><p>There isn't enough in the fridge to build a dare. Check off a few more items above.</p><div class="actions"><button class="btn ghost" type="button" data-box="close">Close</button></div></div>`;return;}
+  el.innerHTML=`<div class="box shake" role="region" aria-label="Mystery box dare">
+    <p class="tag">mystery box dare</p>
+    <h3>${esc(b.title)}</h3>
+    <div class="heat" aria-label="Weirdness ${b.heat} of 3">${"🌶️".repeat(b.heat)}<span style="opacity:.3">${"🌶️".repeat(3-b.heat)}</span></div>
+    <p>${esc(b.line)}</p>
+    <p><b>The dare:</b> ${esc(b.dare)}</p>
+    ${b.notes.map(n=>`<p>${esc(n)}</p>`).join("")}
+    <div id="boxSteps">${steps||""}</div>
+    <div class="actions">
+      <button class="btn" type="button" data-box="again">Shake it again</button>
+      ${sample?`<button class="btn ghost" type="button" data-box="howto">Ask Claude how to make it</button>`:""}
+      <button class="btn ghost" type="button" data-box="save">Add to the menu</button>
+      <button class="btn ghost" type="button" data-box="close">Close</button>
+    </div></div>`;
+}
+async function howTo(){
+  const b=lastBox; if(!b||!sample) return;
+  const rules=[];
+  if(state.diners.has("jo")) rules.push("vegetarian, no fish, no chicken broth, low salt");
+  if(state.diners.has("maya")) rules.push("plant-based option for one person");
+  if(state.diners.has("theo")) rules.push("strictly peanut-free (serious allergy)");
+  if(state.diners.has("sam")) rules.push("one kid refuses anything visibly green");
+  $("boxSteps").innerHTML=`<p><i>Asking Claude…</i></p>`;
+  try{
+    const r=await sample.json(`A family is doing a playful "mystery box" dinner dare. Make this combo actually taste good: "${b.title}" — ${b.line} Pantry staples are fine. House rules: ${rules.join("; ")||"none"}. Prep must fit in ${state.mins} minutes. Reply with only JSON: {"blurb": one fun sentence, "minutes": number, "steps": [3 to 5 short imperative steps]}.`,{modelTier:"quick"});
+    b.blurb=String(r.blurb||""); b.mins=+r.minutes||b.mins; b.steps=(r.steps||[]).slice(0,5).map(String);
+    $("boxSteps").innerHTML=`<p>${esc(b.blurb)} <b>About ${b.mins} min.</b></p><ol>${b.steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol>`;
+  }catch(e){
+    if(e&&e.code==="not_granted"){sample=null;renderBox(b);}
+    else $("boxSteps").innerHTML=`<p>${e&&e.code==="rate_limited"?"Claude is busy right now. Try again in a minute.":"Couldn't get a recipe this time."}</p>`;
+  }
+}
+async function saveBox(){
+  const b=lastBox; if(!b) return;
+  const keys=b.items.map(i=>i.key); if(b.base.item) keys.push(b.base.item);
+  const d={name:b.title,blurb:(b.blurb||b.line)+(b.steps?" Steps: "+b.steps.join(" "):""),mins:b.mins,pantry:b.base.pantry||"",need:keys,opt:[],
+    veg:!b.items.some(i=>i.cat==="meat"),peanuts:false,eggs:b.items.some(i=>i.key==="eggs"),
+    plant:b.items.some(i=>i.cat==="dairy"||i.key==="eggs"||i.cat==="meat")?"swap":"yes",swap:"leave the dairy off Maya's",
+    green:b.items.some(i=>i.green)?"split":"none",salt:"med",onlyDay:null,wild:true};
+  try{ await saveDish(d); toast("Dare accepted. "+b.title+" is on the menu."); }catch(e){ toast(writeErr(e)); }
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",async e=>{
+  const t=e.target.closest("button");if(!t)return;
+  if(t.dataset.day){state.day=+t.dataset.day;defaultDiners();renderControls();renderResults();}
+  else if(t.dataset.who){const k=t.dataset.who;state.diners.has(k)?state.diners.delete(k):state.diners.add(k);renderControls();renderResults();}
+  else if(t.dataset.edit){openForm(state.dishes.find(d=>d.id===t.dataset.edit));}
+  else if(t.dataset.del){const d=state.dishes.find(x=>x.id===t.dataset.del);if(d&&confirm(`Delete "${d.name}" from the menu?`)){try{await removeDish(d.id);toast("Deleted "+d.name+".");}catch(err){toast(writeErr(err));}}}
+  else if(t.dataset.delitem){const k=t.dataset.delitem;saveItems(state.items.filter(i=>i.key!==k));}
+  else if(t.dataset.box==="again"||t.id==="mysteryBtn"){lastBox=mystery();renderBox(lastBox);}
+  else if(t.dataset.box==="howto"){howTo();}
+  else if(t.dataset.box==="save"){saveBox();}
+  else if(t.dataset.box==="close"){$("mystery").innerHTML="";lastBox=null;}
+  else if(t.id==="addDish"){openForm(null);}
+});
+document.addEventListener("change",e=>{
+  const t=e.target;
+  if(t.dataset.inv){saveItems(state.items.map(i=>i.key===t.dataset.inv?{...i,have:t.checked}:i));}
+  if(t.id==="mayaEggs"){state.mayaEggs=t.checked;renderResults();}
+});
+$("mins").addEventListener("input",e=>{state.mins=+e.target.value;$("minsOut").textContent=state.mins+" min";renderResults();});
+$("addItem").addEventListener("submit",e=>{
+  e.preventDefault();const name=$("newItem").value.trim();if(!name)return;
+  let key=slug(name);const keys=new Set(state.items.map(i=>i.key));let n=2;while(keys.has(key))key=slug(name)+"-"+n++;
+  saveItems([...state.items,{key,label:name,have:true,cat:$("newCat").value}]);$("newItem").value="";
+});
+
+/* ---------- boot ---------- */
+defaultDiners();renderAll();
+(async()=>{
+  const c=window.claude&&window.claude.use?window.claude:null;
+  db=c?await c.use("db"):null;
+  if(db){
+    mode="db";let got={d:false,i:false};
+    const ready=()=>{if(got.d&&got.i){state.loaded=true;$("status").textContent="";}};
+    db.collection("dishes").onSnapshot(s=>{state.dishes=s.docs.map(d=>({id:d.id,...d.data()}));got.d=true;ready();renderResults();renderMenu();},
+      ()=>{$("status").textContent="Couldn't load the menu. Reload the page to try again.";});
+    db.doc("kitchen/fridge").onSnapshot(s=>{state.items=s.exists?(s.data().items||[]):[];got.i=true;ready();renderInv();renderResults();renderMenu();},
+      ()=>{$("status").textContent="Couldn't load the fridge list. Reload the page to try again.";});
+  } else {
+    mode="local";state.dishes=LS.get("dishes")||[];state.items=LS.get("items")||[];state.loaded=true;
+    $("status").textContent="Open this page in Claude to load the shared family menu. Changes here are saved on this device only.";
+    renderAll();
+  }
+  sample=c?await c.use("sample"):null;
+  if(lastBox) renderBox(lastBox);
+})();
+</script>
+</body>
+</html>
