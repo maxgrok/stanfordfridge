@@ -24,7 +24,7 @@ export default function FridgePanel({ items, day, onChange }) {
         <h2 id="inv-h" className="m-0 text-[25px]">What's in the fridge</h2>
         <span className="text-xs opacity-60 tnum">{have} of {items.length} in</span>
       </div>
-      <details className="group">
+      <details className="group" open>
         <summary className="btn btn-ghost -ml-1 cursor-pointer list-none">
           <span className="group-open:hidden">Check off what you have, or add and remove items</span>
           <span className="hidden group-open:inline">Hide the fridge list</span>
