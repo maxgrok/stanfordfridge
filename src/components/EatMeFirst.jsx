@@ -1,4 +1,4 @@
-export default function EatMeFirst({ items }) {
+export default function EatMeFirst({ items, action = "Find a recipe", onAction }) {
   return (
     <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-6 gap-y-3 border-y border-accent py-4 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
       <div className="font-heading text-[54px] leading-none font-normal text-accent tnum">{items.length}</div>
@@ -8,7 +8,7 @@ export default function EatMeFirst({ items }) {
         </div>
         <div className="mt-[2px] text-[13px] opacity-75">{items.map((i) => i.name).join(", ") || "Nothing urgent. Nice work."}</div>
       </div>
-      <button className="btn btn-primary col-span-2 justify-self-start sm:col-span-1">Find a recipe</button>
+      <button className="btn btn-primary col-span-2 justify-self-start sm:col-span-1" onClick={onAction}>{action}</button>
     </div>
   );
 }

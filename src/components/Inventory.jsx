@@ -1,7 +1,8 @@
 import { useState } from "react";
 import ExpiryBadge from "./ExpiryBadge.jsx";
 import Seg from "./Seg.jsx";
-import { Check, FreezerIcon, FridgeIcon, PantryIcon } from "./icons.jsx";
+import Chip from "./Chip.jsx";
+import { FreezerIcon, FridgeIcon, PantryIcon } from "./icons.jsx";
 import { CATS, EMPTY, ZONES } from "../data/items.js";
 
 const ZONE_ICON = { Fridge: FridgeIcon, Freezer: FreezerIcon, Pantry: PantryIcon };
@@ -37,16 +38,7 @@ export default function Inventory({ items, onUse, onAdd }) {
 
       <div className="flex flex-wrap gap-2">
         {CATS.map((c) => {
-          const on = cats.includes(c);
-          return (
-            <button key={c} aria-pressed={on} onClick={() => toggle(c)}
-              className={`inline-flex cursor-pointer items-center gap-[6px] rounded-full border bg-transparent px-3 py-1 text-[13px] ${on
-                ? "border-accent text-accent-700 hover:bg-accent/10"
-                : "border-line text-inherit hover:border-accent"}`}>
-              {on && <Check size={13} />}
-              {c}
-            </button>
-          );
+          return <Chip key={c} on={cats.includes(c)} onClick={() => toggle(c)}>{c}</Chip>;
         })}
       </div>
 
