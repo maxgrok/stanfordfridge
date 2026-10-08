@@ -29,3 +29,5 @@
 
 @utility tnum { font-feature-settings: "tnum"; }
 @utility eyebrow { @apply text-[11px] tracking-[.1em] text-accent-700 tnum; }
+
+@keyframes shake { 20% { transform: rotate(-1deg) } 40% { transform: rotate(1deg) } 60% { transform: rotate(-.5deg) } 80% { transform: rotate(.5deg) } }

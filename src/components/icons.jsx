@@ -14,3 +14,7 @@ export const Moon = (p) => <Icon size={14} {...p}><path d="M12 3a6 6 0 0 0 9 9 9
 export const FridgeIcon = (p) => <Icon size={18} w={1.5} {...p}><path d="M5 6a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6ZM5 10h14M15 6v1M15 13v3" /></Icon>;
 export const FreezerIcon = (p) => <Icon size={18} w={1.5} {...p}><path d="M2 12h20M12 2v20M20 16l-4-4 4-4M4 8l4 4-4 4M16 4l-4 4-4-4M8 20l4-4 4 4" /></Icon>;
 export const PantryIcon = (p) => <Icon size={18} w={1.5} {...p}><rect x="2" y="3" width="20" height="5" rx="1" /><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4" /></Icon>;
+export const Alert = (p) => <Icon w={2} {...p}><path d="M12 8v5M12 16.5v.5" /></Icon>;
+export const Clock = (p) => <Icon size={13} {...p}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></Icon>;
+export const X = (p) => <Icon size={14} {...p}><path d="M6 6l12 12M18 6 6 18" /></Icon>;
+export const Box = (p) => <Icon size={15} {...p}><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9ZM3 7.5 12 12l9-4.5M12 12v9" /></Icon>;

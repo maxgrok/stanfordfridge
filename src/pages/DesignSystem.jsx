@@ -99,7 +99,7 @@ export default function DesignSystem() {
 
   return (
     <>
-      <main className="mx-auto max-w-[1200px] px-4 pt-8 pb-24 md:px-8">
+      <div>
         <div className="grid grid-cols-1 items-end gap-8 border-b border-line pb-8 md:grid-cols-2">
           <h1 className="m-0 text-[44px] leading-none font-normal md:text-[64px]">A home for everything<br />in the fridge.</h1>
           <p className="m-0 max-w-[52ch] text-justify hyphens-auto text-pretty">
@@ -242,7 +242,7 @@ export default function DesignSystem() {
             <Pre>{CODE_TOKENS}</Pre>
           </div>
         </Section>
-      </main>
+      </div>
 
       <AddItemDialog open={adding} onClose={() => setAdding(false)} onSave={add} />
       {toast && (
