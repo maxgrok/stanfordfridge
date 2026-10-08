@@ -1,0 +1,76 @@
+/* Classical tokens (from the design system's styles.css) + Fridge's own.
+   Kept unlayered so these values always win over Tailwind's theme layer. */
+:root {
+  --color-bg: #f3f2f2;
+  --color-surface: #eae9e9;
+  --color-text: #201f1d;
+  --color-accent: #b68235;
+  --color-accent-2: #ac803e;
+  --color-divider: color-mix(in srgb, #201f1d 16%, transparent);
+
+  --color-neutral-100: #f8f4f4;
+  --color-neutral-200: #eae7e7;
+  --color-neutral-300: #d7d3d3;
+  --color-neutral-400: #bab6b6;
+  --color-neutral-500: #9b9797;
+  --color-neutral-600: #7d7979;
+  --color-neutral-700: #605d5d;
+  --color-neutral-800: #444141;
+  --color-neutral-900: #2d2b2b;
+
+  --color-accent-100: #fff3e4;
+  --color-accent-200: #ffe3bf;
+  --color-accent-300: #facb8d;
+  --color-accent-400: #e1ad66;
+  --color-accent-500: #c28d41;
+  --color-accent-600: #a06f24;
+  --color-accent-700: #7d5411;
+  --color-accent-800: #5a3b0a;
+  --color-accent-900: #3a270d;
+
+  --font-heading: "Cormorant Garamond", system-ui, sans-serif;
+  --font-heading-weight: 600;
+  --font-body: "Lora", system-ui, sans-serif;
+
+  --space-1: 4.6px;
+  --space-2: 9.2px;
+  --space-3: 13.8px;
+  --space-4: 18.4px;
+  --space-6: 27.6px;
+  --space-8: 36.8px;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 7px;
+
+  --shadow-sm: 0 1px 2px color-mix(in srgb, #2d2b2b 14%, transparent);
+  --shadow-md: 0 3px 10px color-mix(in srgb, #2d2b2b 16%, transparent);
+  --shadow-lg: 0 12px 32px color-mix(in srgb, #2d2b2b 22%, transparent);
+
+  /* Fridge freshness */
+  --fridge-fresh: #4f6b44;
+  --fridge-soon: #8a5d17;
+  --fridge-expired: #9a3b2e;
+}
+
+.dark {
+  --color-bg: #1a1816;
+  --color-surface: #24211e;
+  --color-text: #ece7e1;
+  --color-accent: #d29e55;
+  --color-divider: rgb(236 231 225 / .16);
+  --color-neutral-100: #2d2b2b;
+  --color-neutral-800: #d7d3d3;
+  --color-neutral-900: #000000;
+  --color-accent-100: #3a270d;
+  --color-accent-600: #e1ad66;
+  --color-accent-700: #e1ad66;
+  --color-accent-800: #facb8d;
+  --shadow-sm: 0 0 0 1px rgb(255 255 255 / .04), 0 1px 2px rgb(0 0 0 / .5);
+  --shadow-md: 0 0 0 1px rgb(255 255 255 / .05), 0 4px 12px rgb(0 0 0 / .5);
+  --shadow-lg: 0 0 0 1px rgb(255 255 255 / .06), 0 14px 36px rgb(0 0 0 / .6);
+  --fridge-fresh: #9fb98f;
+  --fridge-soon: #e1ad66;
+  --fridge-expired: #e08a7b;
+  color-scheme: dark;
+}

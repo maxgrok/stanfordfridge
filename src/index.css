@@ -1,0 +1,31 @@
+@import "tailwindcss";
+@import "./styles/classical.css" layer(components);
+@import "./styles/tokens.css";
+
+/* Dark mode is one class on <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Tailwind names from the design system's "In code" config. Every colour points
+   at a variable, so .dark retunes everything. */
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-ink: var(--color-text);
+  --color-line: var(--color-divider);
+  --color-accent: var(--color-accent);
+  --color-accent-700: var(--color-accent-700);
+  --color-fresh: var(--fridge-fresh);
+  --color-soon: var(--fridge-soon);
+  --color-expired: var(--fridge-expired);
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+  --radius: var(--radius-md);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  /* Classical's 4.6px rhythm: p-2 = --space-2, p-8 = --space-8, … */
+  --spacing: 4.6px;
+}
+
+@utility tnum { font-feature-settings: "tnum"; }
+@utility eyebrow { @apply text-[11px] tracking-[.1em] text-accent-700 tnum; }
